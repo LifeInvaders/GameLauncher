@@ -13,7 +13,7 @@ namespace Avalonia.NETCoreApp
     {
         private WebClient _webClient;
         private OperatingSystem os_info;
-        private string OperatingSystem;
+        private OS OperatingSystem;
         private string pathDownload;
 
         public Client()
@@ -24,7 +24,10 @@ namespace Avalonia.NETCoreApp
             switch (Environment.OSVersion.Platform.ToString())
             {
                 case "Win32NT":
-                    OperatingSystem = "Windows";
+                    OperatingSystem = OS.Windows;
+                    break;
+                case "Unix":
+                    OperatingSystem = OS.Unix;
                     break;
             }
 
@@ -37,8 +40,11 @@ namespace Avalonia.NETCoreApp
         {
             switch (OperatingSystem)
             {
-                case "Windows":
+                case OS.Windows:
                     Process.Start(Path.Combine(pathDownload, "Panic At Tortuga.exe"));
+                    break;
+                case OS.Unix:
+                    Process.Start(Path.Combine(pathDownload, "Panic_At_Tortuga.x86_64"));
                     break;
             }
             
@@ -84,12 +90,8 @@ namespace Avalonia.NETCoreApp
         private ReleaseAsset FindAsset(IReadOnlyList<ReleaseAsset> assets)
         {
             foreach (var asset in assets)
-            {
-                if (asset.Name.StartsWith(OperatingSystem))
-                {
+                if (asset.Name.StartsWith(OperatingSystem.ToString()))
                     return asset;
-                }
-            }
 
             return null;
         }
@@ -107,8 +109,8 @@ namespace Avalonia.NETCoreApp
             if (Directory.Exists(pathDownload))
             {
                 ClearFolder(pathDownload);
-                Directory.CreateDirectory(pathDownload);
             }
+            Directory.CreateDirectory(pathDownload);
         }
 
 

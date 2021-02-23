@@ -3,7 +3,7 @@ namespace Avalonia.NETCoreApp.Models
     public enum OS
     {
         Windows,
-        Linux,
+        Unix,
         Mac,
         Null
     }
