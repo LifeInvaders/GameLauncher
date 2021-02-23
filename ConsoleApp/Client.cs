@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -11,7 +12,7 @@ namespace ConsoleApp
     {
         private WebClient _webClient;
         private OperatingSystem os_info;
-        private OS OperatingSystem;
+        private string OperatingSystem;
         private string pathDownload;
 
         public Client()
@@ -22,10 +23,7 @@ namespace ConsoleApp
             switch (Environment.OSVersion.Platform.ToString())
             {
                 case "Win32NT":
-                    OperatingSystem = OS.Windows;
-                    break;
-                default:
-                    OperatingSystem = OS.Null;
+                    OperatingSystem = "Windows";
                     break;
             }
 
@@ -34,12 +32,12 @@ namespace ConsoleApp
                 "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36");
         }
 
-        public Release GetRelease()
+        private Release GetRelease()
         {
             try
             {
                 var content =
-                    _webClient.DownloadString("https://api.github.com/repos/ezBastion/ezb_srv/releases/latest");
+                    _webClient.DownloadString("https://api.github.com/repos/LifeInvaders/game/releases/latest");
                 return JsonConvert.DeserializeObject<Release>(content);
             }
             catch (WebException e)
@@ -49,38 +47,56 @@ namespace ConsoleApp
             }
         }
 
-        public void DownloadLastRelease(ReleaseAsset asset, int version)
+        private void DownloadLastRelease(ReleaseAsset asset, int version)
         {
-            try
-            {
-                if (!Directory.Exists(pathDownload))
-                    Directory.CreateDirectory(pathDownload);
+            string install_path = Path.Combine(pathDownload, "game.zip");
+            _webClient.DownloadFile(asset.browser_download_url, install_path);
 
-                _webClient.DownloadFile(asset.browser_download_url, Path.Combine(pathDownload, asset.Name));
+            ZipFile.ExtractToDirectory(install_path,
+                pathDownload);
+            File.Delete(install_path);
+            File.WriteAllText(Path.Combine(pathDownload, "version"), Convert.ToString(version));
+        }
 
-                ZipFile.ExtractToDirectory(Path.Combine(pathDownload, asset.Name),
-                    Path.Combine(pathDownload, asset.Name));
-                File.Delete(Path.Combine(pathDownload, asset.Name));
-                File.WriteAllText(Path.Combine(pathDownload, "version"), Convert.ToString(version));
-            }
-            catch (WebException e)
+        public void Update()
+        {
+            var release = GetRelease();
+            if (!IsInstalled() || GetVersionInstalled() < release.Id)
             {
-                Console.WriteLine(e);
+                // Télécharge la dernière version
+                RemoveVersionInstalled();
+                DownloadLastRelease(FindAsset(release.Assets), release.Id);
             }
         }
 
-        public bool IsInstalled()
+        private ReleaseAsset FindAsset(IReadOnlyList<ReleaseAsset> assets)
+        {
+            foreach (var asset in assets)
+            {
+                if (asset.Name.StartsWith(OperatingSystem))
+                {
+                    return asset;
+                }
+            }
+
+            return null;
+        }
+
+        private bool IsInstalled()
         {
             return File.Exists(Path.Combine(pathDownload, "version"));
         }
 
-        public int GetVersionInstalled() =>
+        private int GetVersionInstalled() =>
             int.Parse(File.ReadAllText(Path.Combine(pathDownload, "version")) ?? string.Empty);
 
         public void RemoveVersionInstalled()
         {
-            ClearFolder(pathDownload);
-            Directory.CreateDirectory(pathDownload);
+            if (Directory.Exists(pathDownload))
+            {
+                ClearFolder(pathDownload);
+                Directory.CreateDirectory(pathDownload);
+            }
         }
 
 
