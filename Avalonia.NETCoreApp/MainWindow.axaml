@@ -1,0 +1,28 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="400"
+        x:Class="Avalonia.NETCoreApp.MainWindow"
+        Title="Panic At Tortuga Launcher">
+    <!-- Welcome to Avalonia! -->
+
+    <Window.Styles>
+        <Style Selector="TextBlock.h1">
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+    </Window.Styles>
+
+    <!-- <Image Width="75" -->
+    <!--        Height="73" -->
+    <!--        Source="{Binding PlaySource, Converter={StaticResource }}"> -->
+    <DockPanel HorizontalAlignment="Center">
+        <TextBlock Classes="h1">I'm a Heading!</TextBlock>
+        <Button DockPanel.Dock="Bottom" HorizontalAlignment="Center" Classes="h1" Background="Blue" Foreground="White"
+                Click="DownloadClick" Name="{Binding LastName}" Width="160" Height="150">
+            Download and Play
+        </Button>
+    </DockPanel>
+
+</Window>

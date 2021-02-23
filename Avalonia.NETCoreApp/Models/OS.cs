@@ -1,4 +1,4 @@
-namespace ConsoleApp.Models
+namespace Avalonia.NETCoreApp.Models
 {
     public enum OS
     {

@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 
-namespace ConsoleApp.Models
+namespace Avalonia.NETCoreApp.Models
 {
     public class Release
     {

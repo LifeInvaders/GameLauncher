@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using ConsoleApp.Models;
+using Avalonia.NETCoreApp.Models;
 using Newtonsoft.Json;
 
-namespace ConsoleApp
+namespace Avalonia.NETCoreApp
 {
     public class Client
     {
@@ -30,6 +31,17 @@ namespace ConsoleApp
             _webClient = new WebClient();
             _webClient.Headers.Add(
                 "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36");
+        }
+
+        public void Play()
+        {
+            switch (OperatingSystem)
+            {
+                case "Windows":
+                    Process.Start(Path.Combine(pathDownload, "Panic At Tortuga.exe"));
+                    break;
+            }
+            
         }
 
         private Release GetRelease()
